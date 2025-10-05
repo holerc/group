@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Chat Group Tools — Demo</title>
+    <style>
+      :root {
+        --bg: #0f1724;
+        --card: #0b1220;
+        --muted: #94a3b8;
+        --accent: #06b6d4;
+      }
+      * {
+        box-sizing: border-box;
+        font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
+      }
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, #071024 0%, #081226 100%);
+        color: #e6eef6;
+      }
+      .app {
+        max-width: 1100px;
+        margin: 24px auto;
+        padding: 18px;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 18px;
+      }
+      .panel {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(0, 0, 0, 0.06)
+        );
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+      }
+      header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      header h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+
+      /* left column */
+      .left {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .users {
+        height: 300px;
+        overflow: auto;
+        padding: 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 8px;
+        margin-bottom: 6px;
+      }
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0ea5a4, #2563eb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+      .meta {
+        flex: 1;
+      }
+      .meta small {
+        display: block;
+        color: var(--muted);
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      button,
+      input[type="button"],
+      input[type="submit"] {
+        background: var(--accent);
+        border: none;
+        color: #04303a;
+        padding: 8px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button.ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+      }
+
+      /* right column chat area */
+      .chat {
+        display: flex;
+        flex-direction: column;
+        height: 720px;
+      }
+      .messages {
+        flex: 1;
+        padding: 12px;
+        overflow: auto;
+        border-radius: 10px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.01),
+          rgba(255, 255, 255, 0.015)
+        );
+      }
+      .msg {
+        margin-bottom: 12px;
+        padding: 8px;
+        border-radius: 10px;
+        max-width: 70%;
+      }
+      .me {
+        align-self: flex-end;
+        background: linear-gradient(90deg, #064e3b, #16a34a);
+      }
+      .other {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .msg .meta {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .composer {
+        display: flex;
+        gap: 8px;
+        padding-top: 10px;
+      }
+      .composer input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: inherit;
+      }
+
+      /* admin area */
+      .admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .small {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .pill {
+        display: inline-block;
+        padding: 6px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .search {
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: transparent;
+        color: inherit;
+      }
+      footer {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      /* responsive */
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .chat {
+          height: 600px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="panel left">
+        <header>
+          <h1>Chat Group Tools</h1>
+          <div class="pill">Demo</div>
+        </header>
+
+        <div>
+          <label class="small">Select active user</label>
+          <select
+            id="activeUser"
+            style="
+              width: 100%;
+              margin-top: 6px;
+              padding: 8px;
+              border-radius: 8px;
+              background: transparent;
+              color: inherit;
+              border: 1px solid rgba(255, 255, 255, 0.03);
+            "
+          ></select>
+        </div>
+
+        <div style="display: flex; gap: 8px">
+          <input
+            id="newUserName"
+            placeholder="New user name"
+            style="
+              flex: 1;
+              padding: 8px;
+              border-radius: 8px;
+              background: transparent;
+              border: 1px solid rgba(255, 255, 255, 0.03);
+            "
+          />
+          <button id="addUserBtn">Add</button>
+        </div>
+
+        <div class="users" id="usersList"></div>
+
+        <div style="margin-top: 6px">
+          <div class="small">
+            Auto-responder keywords (format: keyword=>reply, one per line)
+          </div>
+          <textarea
+            id="autoReplies"
+            rows="6"
+            style="
+              width: 100%;
+              margin-top: 6px;
+              padding: 8px;
+              border-radius: 8px;
+              background: transparent;
+              border: 1px solid rgba(255, 255, 255, 0.03);
+              color: inherit;
+            "
+          ></textarea>
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <button id="saveReplies">Save</button>
+            <button class="ghost" id="clearReplies">Clear</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px">
+          <div class="small">Filters (banned words, comma separated)</div>
+          <input
+            id="filters"
+            placeholder="badword1,badword2"
+            style="
+              width: 100%;
+              padding: 8px;
+              border-radius: 8px;
+              background: transparent;
+              border: 1px solid rgba(255, 255, 255, 0.03);
+              margin-top: 6px;
+            "
+          />
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <button id="saveFilters">Save</button>
+            <button class="ghost" id="clearFilters">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel chat">
+        <div class="topbar">
+          <div>
+            <strong id="roomName">Group Chat</strong>
+            <div class="small">
+              Messages are stored locally (localStorage). Use Export/Import to
+              share.
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input
+              id="search"
+              placeholder="Search messages..."
+              class="search"
+            />
+            <button id="exportBtn">Export</button>
+            <button id="importBtn" class="ghost">Import</button>
+          </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="composer">
+          <input
+            id="messageInput"
+            type="text"
+            placeholder="Type a message or /cmd (e.g. /poll)"
+          />
+          <button id="sendBtn">Send</button>
+          <button id="moreBtn" class="ghost">Tools</button>
+        </div>
+
+        <div style="margin-top: 10px">
+          <div class="admin-grid">
+            <div>
+              <div class="small">Quick admin actions</div>
+              <div style="display: flex; gap: 6px; margin-top: 8px">
+                <button id="toggleMute">Mute/Unmute User</button>
+                <button id="kickUser" class="ghost">Kick</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="small">Pin / Poll</div>
+              <div style="display: flex; gap: 6px; margin-top: 8px">
+                <button id="pinBtn">Pin Message</button>
+                <button id="pollBtn" class="ghost">Create Poll</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="pinned" style="margin-top: 8px"></div>
+          <footer>
+            Tip: Type <code>/poll question|option1|option2|... </code> to create
+            a poll. Type <code>/help</code> for commands.
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Simple chat group tools single-file app
+      const STORAGE_KEY = "cg_demo_v1";
+      let state = {
+        users: [
+          { id: uid(), name: "Alice", role: "admin" },
+          { id: uid(), name: "Bob", role: "member" },
+        ],
+        activeUserId: null,
+        messages: [],
+        filters: [],
+        autoReplies: {},
+        pinned: null,
+        muted: {}, // userId => boolean
+      };
+
+      function uid() {
+        return "u" + Math.random().toString(36).slice(2, 9);
+      }
+
+      // --- Persistence ---
+      function load() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          try {
+            state = JSON.parse(raw);
+          } catch (e) {
+            console.warn("load failed", e);
+          }
+        }
+        if (!state.activeUserId && state.users && state.users[0])
+          state.activeUserId = state.users[0].id;
+      }
+      function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      // --- UI Wiring ---
+      const usersList = document.getElementById("usersList");
+      const activeUserSelect = document.getElementById("activeUser");
+      const addUserBtn = document.getElementById("addUserBtn");
+      const newUserName = document.getElementById("newUserName");
+      const messagesEl = document.getElementById("messages");
+      const messageInput = document.getElementById("messageInput");
+      const sendBtn = document.getElementById("sendBtn");
+      const saveRepliesBtn = document.getElementById("saveReplies");
+      const autoRepliesTA = document.getElementById("autoReplies");
+      const saveFiltersBtn = document.getElementById("saveFilters");
+      const filtersInput = document.getElementById("filters");
+      const pinnedEl = document.getElementById("pinned");
+      const exportBtn = document.getElementById("exportBtn");
+      const importBtn = document.getElementById("importBtn");
+      const searchInput = document.getElementById("search");
+      const toggleMuteBtn = document.getElementById("toggleMute");
+      const kickBtn = document.getElementById("kickUser");
+      const pinBtn = document.getElementById("pinBtn");
+      const pollBtn = document.getElementById("pollBtn");
+
+      // init
+      load();
+      renderAll();
+
+      // render users
+      function renderUsers() {
+        usersList.innerHTML = "";
+        activeUserSelect.innerHTML = "";
+        state.users.forEach((u) => {
+          const div = document.createElement("div");
+          div.className = "user";
+          const av = document.createElement("div");
+          av.className = "avatar";
+          av.textContent = u.name[0] || "U";
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.innerHTML = `<strong>${u.name}</strong><small>${
+            u.role || "member"
+          }</small>`;
+          const ctrls = document.createElement("div");
+          ctrls.className = "controls";
+          const btnMute = document.createElement("button");
+          btnMute.textContent = state.muted[u.id] ? "Unmute" : "Mute";
+          btnMute.onclick = () => {
+            state.muted[u.id] = !state.muted[u.id];
+            save();
+            renderAll();
+          };
+          const btnKick = document.createElement("button");
+          btnKick.className = "ghost";
+          btnKick.textContent = "Kick";
+          btnKick.onclick = () => {
+            if (confirm("Kick " + u.name + "?")) {
+              state.users = state.users.filter((x) => x.id !== u.id);
+              if (state.activeUserId === u.id)
+                state.activeUserId = state.users[0]?.id || null;
+              save();
+              renderAll();
+            }
+          };
+          ctrls.appendChild(btnMute);
+          ctrls.appendChild(btnKick);
+          div.appendChild(av);
+          div.appendChild(meta);
+          div.appendChild(ctrls);
+          usersList.appendChild(div);
+
+          // add to select
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = u.name;
+          if (state.activeUserId === u.id) opt.selected = true;
+          activeUserSelect.appendChild(opt);
+        });
+      }
+
+      addUserBtn.onclick = () => {
+        const name = newUserName.value.trim();
+        if (!name) return alert("enter a name");
+        const user = { id: uid(), name, role: "member" };
+        state.users.push(user);
+        state.activeUserId = user.id;
+        newUserName.value = "";
+        save();
+        renderAll();
+      };
+      activeUserSelect.onchange = (e) => {
+        state.activeUserId = e.target.value;
+        save();
+        renderAll();
+      };
+
+      // render messages
+      function renderMessages(filterText = "") {
+        messagesEl.innerHTML = "";
+        const list = state.messages.filter((m) => {
+          if (!filterText) return true;
+          const t = filterText.toLowerCase();
+          return (
+            (m.text || "").toLowerCase().includes(t) ||
+            (m.userName || "").toLowerCase().includes(t)
+          );
+        });
+        list.forEach((m) => {
+          const div = document.createElement("div");
+          div.className =
+            "msg " + (m.userId === state.activeUserId ? "me" : "other");
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent = `${m.userName} • ${new Date(
+            m.ts
+          ).toLocaleString()}`;
+          const body = document.createElement("div");
+          body.textContent = m.text;
+          const actions = document.createElement("div");
+          actions.style.marginTop = "6px";
+          const btnReply = document.createElement("button");
+          btnReply.className = "ghost";
+          btnReply.textContent = "Reply";
+          btnReply.onclick = () => {
+            messageInput.value = "@" + m.userName + " ";
+            messageInput.focus();
+          };
+          const btnDel = document.createElement("button");
+          btnDel.textContent = "Delete";
+          btnDel.onclick = () => {
+            if (confirm("Delete message?")) {
+              state.messages = state.messages.filter((x) => x.id !== m.id);
+              save();
+              renderAll();
+            }
+          };
+          actions.appendChild(btnReply);
+          actions.appendChild(btnDel);
+          div.appendChild(meta);
+          div.appendChild(body);
+          div.appendChild(actions);
+          messagesEl.appendChild(div);
+        });
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      // message send with filters and auto-reply
+      sendBtn.onclick = () => sendMessage();
+      messageInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendMessage();
+      });
+
+      function sendMessage() {
+        const txt = messageInput.value.trim();
+        if (!txt) return;
+        const user = state.users.find((u) => u.id === state.activeUserId);
+        if (!user) return alert("choose a user");
+        if (state.muted[user.id]) return alert(user.name + " is muted");
+
+        // commands
+        if (txt.startsWith("/")) {
+          handleCommand(txt);
+          messageInput.value = "";
+          return;
+        }
+
+        // filter words
+        const banned = state.filters || [];
+        const lower = txt.toLowerCase();
+        for (const b of banned) {
+          if (b && lower.includes(b.toLowerCase())) {
+            return alert("Message blocked by filter");
+          }
+        }
+
+        const msg = {
+          id: uid(),
+          userId: user.id,
+          userName: user.name,
+          text: txt,
+          ts: Date.now(),
+        };
+        state.messages.push(msg);
+        save();
+        renderAll();
+        messageInput.value = "";
+
+        // auto-replies
+        for (const k in state.autoReplies) {
+          if (lower.includes(k.toLowerCase())) {
+            setTimeout(() => {
+              const botMsg = {
+                id: uid(),
+                userId: "bot",
+                userName: "AutoReply",
+                text: state.autoReplies[k],
+                ts: Date.now(),
+              };
+              state.messages.push(botMsg);
+              save();
+              renderAll();
+            }, 600);
+            break;
+          }
+        }
+      }
+
+      function handleCommand(txt) {
+        const parts = txt.slice(1).split(" ");
+        const cmd = parts[0].toLowerCase();
+        if (cmd === "poll") {
+          // /poll question|opt1|opt2
+          const rest = txt.slice(6).trim();
+          const bits = rest
+            .split("|")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          if (bits.length < 2)
+            return alert("poll format: /poll question|opt1|opt2");
+          const q = bits[0],
+            opts = bits.slice(1);
+          createPoll(q, opts);
+        } else if (cmd === "help") {
+          alert(
+            "Commands:\n/poll question|opt1|opt2 - create poll\n/help - show this help"
+          );
+        } else {
+          alert("Unknown command: " + cmd);
+        }
+      }
+
+      function createPoll(question, options) {
+        const poll = {
+          id: uid(),
+          type: "poll",
+          question,
+          options: options.map((o) => ({ id: uid(), label: o, votes: 0 })),
+          creator: state.activeUserId,
+          ts: Date.now(),
+        };
+        state.messages.push(poll);
+        save();
+        renderAll();
+      }
+
+      // poll voting via click delegation
+      messagesEl.addEventListener("click", (e) => {
+        if (e.target.dataset.vote) {
+          const pid = e.target.dataset.poll;
+          const optid = e.target.dataset.vote;
+          const userId = state.activeUserId;
+          const msg = state.messages.find((m) => m.id === pid);
+          if (!msg) return; // prevent multiple votes by same user by storing voted list
+          msg.voted = msg.voted || {};
+          if (msg.voted[userId]) return alert("You already voted");
+          const opt = msg.options.find((x) => x.id === optid);
+          if (opt) {
+            opt.votes++;
+            msg.voted[userId] = optid;
+            save();
+            renderAll();
+          }
+        }
+      });
+
+      // quick admin actions
+      toggleMuteBtn.onclick = () => {
+        const uid = state.activeUserId;
+        if (!uid) return alert("select user");
+        state.muted[uid] = !state.muted[uid];
+        save();
+        renderAll();
+      };
+      kickBtn.onclick = () => {
+        const uid = state.activeUserId;
+        if (!uid) return alert("select user");
+        const u = state.users.find((x) => x.id === uid);
+        if (!u) return;
+        if (confirm("Kick " + u.name + "?")) {
+          state.users = state.users.filter((x) => x.id !== uid);
+          state.activeUserId = state.users[0]?.id || null;
+          save();
+          renderAll();
+        }
+      };
+
+      pinBtn.onclick = () => {
+        const last = state.messages[state.messages.length - 1];
+        if (!last) return alert("no messages");
+        state.pinned = last;
+        save();
+        renderAll();
+      };
+
+      pollBtn.onclick = () => {
+        const q = prompt("Poll question");
+        if (!q) return;
+        const opts = prompt("Options separated by | (e.g. Yes|No|Maybe)");
+        if (!opts) return;
+        createPoll(
+          q,
+          opts.split("|").map((s) => s.trim())
+        );
+      };
+
+      // save auto replies and filters
+      saveRepliesBtn.onclick = () => {
+        const lines = autoRepliesTA.value
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const map = {};
+        for (const line of lines) {
+          const idx = line.indexOf("=>");
+          if (idx > 0) {
+            const k = line.slice(0, idx).trim();
+            const v = line.slice(idx + 2).trim();
+            if (k) map[k] = v;
+          }
+        }
+        state.autoReplies = map;
+        save();
+        alert("Saved");
+      };
+      clearReplies.onclick = () => {
+        autoRepliesTA.value = "";
+        state.autoReplies = {};
+        save();
+        renderAll();
+      };
+
+      saveFiltersBtn.onclick = () => {
+        const vals = filtersInput.value
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        state.filters = vals;
+        save();
+        alert("Saved");
+      };
+      clearFilters.onclick = () => {
+        filtersInput.value = "";
+        state.filters = [];
+        save();
+        renderAll();
+      };
+
+      // export/import
+      exportBtn.onclick = () => {
+        const blob = new Blob([JSON.stringify(state, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "chat-group-export.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      };
+      importBtn.onclick = () => {
+        const inp = document.createElement("input");
+        inp.type = "file";
+        inp.accept = "application/json";
+        inp.onchange = (e) => {
+          const f = e.target.files[0];
+          if (!f) return;
+          const r = new FileReader();
+          r.onload = (ev) => {
+            try {
+              const data = JSON.parse(ev.target.result);
+              if (confirm("Replace local chat with imported data?")) {
+                state = data;
+                save();
+                renderAll();
+              }
+            } catch (err) {
+              alert("Invalid file");
+            }
+          };
+          r.readAsText(f);
+        };
+        inp.click();
+      };
+
+      // search
+      searchInput.addEventListener("input", (e) => {
+        renderMessages(e.target.value);
+      });
+
+      // pinned
+      function renderPinned() {
+        pinnedEl.innerHTML = "";
+        if (!state.pinned) return;
+        const p = document.createElement("div");
+        p.className = "pill";
+        p.textContent = `Pinned: ${
+          state.pinned.userName || state.pinned.question || "message"
+        } — ${state.pinned.text || state.pinned.question || ""}`;
+        const btn = document.createElement("button");
+        btn.className = "ghost";
+        btn.textContent = "Unpin";
+        btn.onclick = () => {
+          state.pinned = null;
+          save();
+          renderAll();
+        };
+        p.appendChild(btn);
+        pinnedEl.appendChild(p);
+      }
+
+      // render everything
+      function renderAll() {
+        renderUsers();
+        renderMessages(searchInput.value || "");
+        autoRepliesTA.value = Object.entries(state.autoReplies || {})
+          .map(([k, v]) => k + "=>" + v)
+          .join("\n");
+        filtersInput.value = (state.filters || []).join(",");
+        renderPinned();
+        save();
+        renderMessages(searchInput.value || "");
+        // render polls inside messages listing: custom rendering by replacing poll objects
+        messagesEl.innerHTML = "";
+        state.messages
+          .filter((m) => {
+            const ft = searchInput.value.trim().toLowerCase();
+            if (!ft) return true;
+            return (
+              (m.text || m.question || "").toLowerCase().includes(ft) ||
+              (m.userName || "").toLowerCase().includes(ft)
+            );
+          })
+          .forEach((m) => {
+            const div = document.createElement("div");
+            if (m.type === "poll") {
+              div.className = "msg other";
+              const meta = document.createElement("div");
+              meta.className = "meta";
+              meta.textContent = `Poll by ${
+                state.users.find((u) => u.id === m.creator)?.name || "Unknown"
+              } • ${new Date(m.ts).toLocaleString()}`;
+              const q = document.createElement("div");
+              q.style.fontWeight = "700";
+              q.textContent = m.question;
+              const list = document.createElement("div");
+              list.style.marginTop = "8px";
+              m.options.forEach((opt) => {
+                const row = document.createElement("div");
+                row.style.display = "flex";
+                row.style.justifyContent = "space-between";
+                row.style.alignItems = "center";
+                row.style.marginTop = "6px";
+                const label = document.createElement("div");
+                label.textContent = opt.label + " (" + opt.votes + ")";
+                const vote = document.createElement("button");
+                vote.textContent = "Vote";
+                vote.dataset.vote = opt.id;
+                vote.dataset.poll = m.id;
+                list.appendChild(row);
+                row.appendChild(label);
+                row.appendChild(vote);
+              });
+              div.appendChild(meta);
+              div.appendChild(q);
+              div.appendChild(list);
+            } else {
+              div.className =
+                "msg " + (m.userId === state.activeUserId ? "me" : "other");
+              const meta = document.createElement("div");
+              meta.className = "meta";
+              meta.textContent = `${m.userName} • ${new Date(
+                m.ts
+              ).toLocaleString()}`;
+              const body = document.createElement("div");
+              body.textContent = m.text;
+              div.appendChild(meta);
+              div.appendChild(body);
+            }
+            // actions
+            const actions = document.createElement("div");
+            actions.style.marginTop = "6px";
+            const btnReply = document.createElement("button");
+            btnReply.className = "ghost";
+            btnReply.textContent = "Reply";
+            btnReply.onclick = () => {
+              messageInput.value = "@" + (m.userName || "") + " ";
+              messageInput.focus();
+            };
+            const btnDel = document.createElement("button");
+            btnDel.textContent = "Delete";
+            btnDel.onclick = () => {
+              if (confirm("Delete?")) {
+                state.messages = state.messages.filter((x) => x.id !== m.id);
+                save();
+                renderAll();
+              }
+            };
+            actions.appendChild(btnReply);
+            actions.appendChild(btnDel);
+            div.appendChild(actions);
+            messagesEl.appendChild(div);
+          });
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      // First run seed
+      if (!state._inited) {
+        state._inited = true;
+        if (!state.users || state.users.length === 0)
+          state.users = [
+            { id: uid(), name: "Alice", role: "admin" },
+            { id: uid(), name: "Bob", role: "member" },
+          ];
+        state.activeUserId = state.users[0].id;
+        state.messages.push({
+          id: uid(),
+          userId: state.users[0].id,
+          userName: state.users[0].name,
+          text: "Welcome to the group! Type /help for commands.",
+          ts: Date.now(),
+        });
+        save();
+      }
+    </script>
+  </body>
+</html>
