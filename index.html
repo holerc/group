@@ -3,224 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Full Messenger Chat</title>
-    <style>
-      body {
-        font-family: Arial;
-        margin: 0;
-        background: #ececec;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-      }
-      .chat-wrapper {
-        width: 100%;
-        max-width: 500px;
-        height: 90vh;
-        background: #fff;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      }
-      .header {
-        background: #06b6d4;
-        color: #fff;
-        text-align: center;
-        padding: 15px;
-        font-weight: bold;
-        font-size: 1.2rem;
-      }
-      .messages {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        scroll-behavior: smooth;
-      }
-      .message {
-        display: flex;
-        margin-bottom: 10px;
-        max-width: 80%;
-      }
-      .message.me {
-        align-self: flex-end;
-        flex-direction: row-reverse;
-      }
-      .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #ccc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-weight: bold;
-        margin-right: 10px;
-        margin-left: 10px;
-        flex-shrink: 0;
-      }
-      .bubble {
-        padding: 10px;
-        border-radius: 10px;
-        background: #e0e0e0;
-        position: relative;
-      }
-      .message.me .bubble {
-        background: #06b6d4;
-        color: #fff;
-      }
-      .timestamp {
-        font-size: 0.7rem;
-        color: #555;
-        margin-top: 2px;
-        text-align: right;
-      }
-      .input-area {
-        display: flex;
-        border-top: 1px solid #ccc;
-      }
-      .input-area input {
-        flex: 1;
-        padding: 10px;
-        border: none;
-        outline: none;
-        font-size: 1rem;
-      }
-      .input-area button {
-        padding: 10px 15px;
-        border: none;
-        background: #06b6d4;
-        color: #fff;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-      .login {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: #ececec;
-      }
-      .login input {
-        padding: 10px;
-        margin-bottom: 10px;
-        width: 200px;
-        font-size: 1rem;
-      }
-      .login button {
-        padding: 10px 15px;
-        background: #06b6d4;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-    </style>
+    <title>Display</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="loginScreen" class="login">
-      <h2>Enter Username</h2>
-      <input type="text" id="loginUsername" placeholder="Your name" />
-      <button onclick="login()">Login</button>
-    </div>
-
-    <div id="chatScreen" class="chat-wrapper" style="display: none">
-      <div class="header">Messenger Chat</div>
-      <div class="messages" id="messages"></div>
-      <div class="input-area">
-        <input type="text" id="msgInput" placeholder="Type a message..." />
-        <button onclick="sendMessage()">Send</button>
+    <div class="navbar">
+      <div class="nav">
+        <ul class="main-nav">
+          <li><a href="#">HOME</a></li>
+          <li><a href="#">ABOUT</a></li>
+          <li><a href="#">PRODUCT</a></li>
+          <li><a href="#">SHOP NOW</a></li>
+        </ul>
       </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <div class="container">
+      <div class="box">
+        <div class="picture">
+          <img
+            src="https://www.ione.com.kh/wp-content/uploads/2025/09/iphone-17-pro-4-cambodia.png"
+            alt="Iphone 17 Pro Max"
+          />
+        </div>
+        <div class="description">
+          <h2 class="title">Iphone 17 Pro Max</h2>
+          <p class="price">$2199</p>
+        </div>
+      </div>
 
-    <script>
-      // Firebase config
-      const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT.firebaseapp.com",
-        databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT.appspot.com",
-        messagingSenderId: "SENDER_ID",
-        appId: "APP_ID",
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
+      <div class="box">
+        <div class="picture">
+          <img
+            src="https://www.ione.com.kh/wp-content/uploads/2025/09/iphone-17-pro-4-cambodia.png"
+            alt="MacBook Pro"
+          />
+        </div>
+        <div class="description">
+          <h2 class="title">MacBook Pro M3</h2>
+          <p class="price">$2599</p>
+        </div>
+      </div>
 
-      let username = "";
+      <div class="box">
+        <div class="picture">
+          <img
+            src="https://www.ione.com.kh/wp-content/uploads/2025/09/iphone-17-pro-4-cambodia.png"
+            alt="Apple Watch Ultra"
+          />
+        </div>
+        <div class="description">
+          <h2 class="title">Apple Watch Ultra</h2>
+          <p class="price">$899</p>
+        </div>
+      </div>
 
-      // Login function
-      function login() {
-        const input = document.getElementById("loginUsername").value.trim();
-        if (!input) return alert("Enter a username!");
-        username = input;
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("chatScreen").style.display = "flex";
-        listenMessages();
-      }
+      <div class="box">
+        <div class="picture">
+          <img
+            src="https://www.ione.com.kh/wp-content/uploads/2025/09/iphone-17-pro-4-cambodia.png"
+            alt="AirPods Max"
+          />
+        </div>
+        <div class="description">
+          <h2 class="title">AirPods Max</h2>
+          <p class="price">$549</p>
+        </div>
+      </div>
 
-      const messagesDiv = document.getElementById("messages");
+      <div class="box">
+        <div class="picture">
+          <img
+            src="https://www.ione.com.kh/wp-content/uploads/2025/09/iphone-17-pro-4-cambodia.png"
+            alt="iPad Pro"
+          />
+        </div>
+        <div class="description">
+          <h2 class="title">iPad Pro 13-inch</h2>
+          <p class="price">$1299</p>
+        </div>
+      </div>
 
-      // Generate random color for avatar based on username
-      function stringToColor(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++)
-          hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        const c = (hash & 0x00ffffff).toString(16).toUpperCase();
-        return "#" + "00000".substring(0, 6 - c.length) + c;
-      }
-
-      // Listen for real-time messages
-      function listenMessages() {
-        db.ref("chat").on("child_added", (snapshot) => {
-          const msg = snapshot.val();
-          addMessage(msg);
-        });
-      }
-
-      // Add message to chat window
-      function addMessage(msg) {
-        const div = document.createElement("div");
-        div.className =
-          "message " + (msg.username === username ? "me" : "other");
-
-        const avatar = document.createElement("div");
-        avatar.className = "avatar";
-        avatar.style.backgroundColor = stringToColor(msg.username);
-        avatar.textContent = msg.username[0].toUpperCase();
-
-        const bubble = document.createElement("div");
-        bubble.className = "bubble";
-        bubble.innerHTML = `<div>${
-          msg.text
-        }</div><div class="timestamp">${new Date(
-          msg.time
-        ).toLocaleTimeString()}</div>`;
-
-        div.appendChild(avatar);
-        div.appendChild(bubble);
-        messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
-
-      // Send message
-      function sendMessage() {
-        const text = document.getElementById("msgInput").value.trim();
-        if (!text) return;
-        const msg = { username, text, time: Date.now() };
-        db.ref("chat").push(msg);
-        document.getElementById("msgInput").value = "";
-      }
-    </script>
+      <div class="box">
+        <div class="picture">
+          <img
+            src="https://www.ione.com.kh/wp-content/uploads/2025/09/iphone-17-pro-4-cambodia.png"
+            alt="Gaming Console"
+          />
+        </div>
+        <div class="description">
+          <h2 class="title">Next-Gen Console</h2>
+          <p class="price">$499</p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

@@ -1,0 +1,139 @@
+/* 1. Global Reset & Typography */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* ទំនើប និងចាំបាច់ */
+  font-family: "Arial", sans-serif; /* ប្រើពុម្ពអក្សរស្អាត */
+}
+
+body {
+  background-color: #1a1a1a; /* Dark Mode Background */
+  color: #f0f0f0; /* Light Text Color */
+  line-height: 1.6;
+}
+
+/* 2. Navigation Bar (Navbar) Styles using Flexbox */
+.navbar {
+  width: 100%;
+  background-color: #222222; /* ពណ៌រាងងងឹតជាង Body */
+  padding: 15px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex; /* ប្រើ Flexbox សម្រាប់តម្រៀប */
+  justify-content: flex-end; /* រុញ Menu ទៅខាងស្ដាំ */
+  align-items: center;
+  padding: 0 20px;
+}
+
+.main-nav {
+  list-style: none;
+  display: flex;
+  gap: 30px; /* ចន្លោះរវាង Menu Items */
+}
+
+.main-nav li a {
+  text-decoration: none;
+  color: #cccccc;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 5px 10px;
+  transition: color 0.3s, border-bottom 0.3s; /* បន្ថែម Animation */
+}
+
+.main-nav li a:hover {
+  color: #00bcd4; /* ពណ៌ខៀវស្រស់ថ្លាសម្រាប់ Hover */
+  border-bottom: 2px solid #00bcd4;
+}
+
+/* 3. Product Container (Grid Layout) */
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  /* ប្រើ CSS Grid សម្រាប់ដាក់ Product Box */
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(300px, 1fr)
+  ); /* Responsive Grid */
+  gap: 30px; /* ចន្លោះរវាង Boxes */
+}
+
+/* 4. Individual Product Box Styles */
+.box {
+  background-color: #2a2a2a;
+  border-radius: 12px; /* កោងជ្រុង */
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* ស្រមោលជ្រៅ */
+  transition: transform 0.3s ease-in-out; /* Animation ពេល Hover */
+}
+
+.box:hover {
+  transform: translateY(-5px); /* រំកិលឡើងលើបន្តិចពេល Hover */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* 5. Product Image Styles */
+.picture {
+  width: 100%;
+  height: auto; /* កម្ពស់តាមរូបភាព */
+  overflow: hidden;
+  background-color: #333;
+}
+
+.picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ធានារូបភាពពេញ Box */
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.box:hover .picture img {
+  transform: scale(1.05); /* Zoom in បន្តិចពេល Hover */
+}
+
+/* 6. Product Description Styles */
+.description {
+  padding: 20px;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+.price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #4caf50; /* ពណ៌បៃតងស្រស់ថ្លាសម្រាប់តម្លៃ */
+  margin-top: 10px;
+}
+
+/* 7. Media Queries for Mobile Responsiveness */
+@media (max-width: 600px) {
+  .nav {
+    justify-content: center; /* ដាក់ Menu នៅកណ្ដាលសម្រាប់ទូរស័ព្ទ */
+  }
+
+  .main-nav {
+    gap: 15px; /* កាត់បន្ថយចន្លោះ */
+  }
+
+  .main-nav li a {
+    font-size: 0.9rem;
+    padding: 5px;
+  }
+
+  .container {
+    grid-template-columns: 1fr; /* ដាក់ Box តែមួយជួរសម្រាប់ទូរស័ព្ទ */
+    padding: 10px;
+  }
+}
